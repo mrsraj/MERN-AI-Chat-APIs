@@ -2,7 +2,7 @@ const User = require("../models/userRegistration.model");
 const bcrypt = require("bcryptjs");
 
 const userRegistration = async (req, res) => {
-    const { email, fullname, password } = req.body;
+    const { email, fullname, password, googleId } = req.body;
 
     if (!email || !fullname || !password) {
         return res.status(400).json({ message: "All fields are required" });
@@ -22,6 +22,7 @@ const userRegistration = async (req, res) => {
         const user = new User({
             fullname, // or fullname depending on your schema
             email,
+            googleId,
             password: hashedPassword
         });
 
@@ -29,7 +30,7 @@ const userRegistration = async (req, res) => {
 
         return res.status(201).json({
             message: "User registered successfully",
-            user: { name: user.name, email: user.email }
+            user: { name: user.fullname, email: user.email }
         });
     } catch (error) {
         console.error(error);

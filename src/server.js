@@ -1,6 +1,10 @@
 require("dotenv").config();
 const PORT = process.env.PORT; 
 
+const passport = require("passport");
+require("./config/passport");
+
+
 const express = require("express");
 const app = express();
 const connectDB = require("./config/db");
@@ -9,6 +13,7 @@ connectDB();
 
 // Json
 app.use(express.json());
+app.use(passport.initialize());
 
 //router import
 const authrouter = require("./routes/auth.router");
