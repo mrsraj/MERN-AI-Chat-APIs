@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const userRegistration = require("../Auth/Register");
+const loginUser = require("../Auth/Login");
+
 const passport = require("passport"); // ✅ FIXED
 
 // 🔥 DEBUG ROUTE (NO PASSPORT)
@@ -31,5 +33,6 @@ router.get(
 );
 
 router.post("/register", userRegistration);
+router.post("/login", loginUser);
 
 module.exports = router;
