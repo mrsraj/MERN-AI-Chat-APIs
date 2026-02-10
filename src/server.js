@@ -1,14 +1,22 @@
 require("dotenv").config();
 const PORT = process.env.PORT;
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
+// passport middleware
 const passport = require("passport");
+
 require("./config/passport");
 
+//Express App create..
 const express = require("express");
 const app = express();
-const connectDB = require("./config/db");
+
+//cookie setup
+app.use(cookieParser());
+
 //call db connection
+const connectDB = require("./config/db");
 connectDB();
 
 const corsOptions = {
@@ -19,7 +27,7 @@ const corsOptions = {
 };
 
 // app.use(cors(corsOptions));
-app.use(cors());
+app.use(cors({credentials: true}));
 
 // Json
 app.use(express.json());
