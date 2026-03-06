@@ -1,49 +1,72 @@
-const User = require("../models/userRegistration.model");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import User from "../models/userRegistration.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+// 🔐 Create Access Token (Short Expiry)
+function createAccessToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
+}
+
+// 🔄 Create Refresh Token (Long Expiry)
+function createRefreshToken(payload) {
+  return jwt.sign(payload, process.env.JWT_SECRET_REFRESH, { expiresIn: "7d" });
+}
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // 🔎 Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
+    // 🔐 Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+    // 🧾 Create payload
+    const payload = {
+      id: user._id,
+      email: user.email
+    };
 
-    // 🍪 SET COOKIE FIRST
-    res.cookie("token", token, {
+    // 🎟️ Generate Tokens
+    const accessToken = createAccessToken(payload);
+    const refreshToken = createRefreshToken(payload);
+
+    // 🍪 Set Access Token Cookie
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: false,      // true in production (HTTPS)
-      sameSite: "lax",    // "none" if different domain + HTTPS
-      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "lax",
+      // secure: process.env.NODE_ENV === "production",
     });
 
-    // ✅ THEN send response
-    res.status(200).json({
+    // 🍪 Set Refresh Token Cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/refresh",
+      // secure: process.env.NODE_ENV === "production",
+    });
+
+    // ✅ Send Response
+    return res.status(200).json({
       message: "Login successful",
       user: {
         id: user._id,
         email: user.email,
-        name: user.fullname,
-      },
+        name: user.fullname
+      }
     });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-module.exports = login;
+export default login;
