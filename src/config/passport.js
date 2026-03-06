@@ -1,6 +1,6 @@
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const User = require("../models/userRegistration.model");
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import User from "../models/userRegistration.model.js";
 
 passport.use(
     new GoogleStrategy(
@@ -31,4 +31,4 @@ passport.use(
     )
 );
 
-// ✅ NO EXPORT NEEDED
+// No export needed (side-effect file)
