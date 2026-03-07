@@ -1,56 +1,57 @@
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import passport from "passport";
+
+import chatRoutes from "./routes/chat.routes.js";
+import authrouter from "./routes/auth.router.js";
+import connectDB from "./config/db.js";
+
+import "./config/passport.js";
+
 const PORT = process.env.PORT;
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
 
-// passport middleware
-const passport = require("passport");
-
-require("./config/passport");
-
-//Express App create..
-const express = require("express");
+// Create app
 const app = express();
 
-//cookie setup
-app.use(cookieParser());
-
-//call db connection
-const connectDB = require("./config/db");
+// Connect DB
 connectDB();
 
-const corsOptions = {
-    origin: "http://localhost:3000", // frontend URL
-    methods: ["GET", "POST", "PUT", "DELETE"],
+// CORS
+app.use(
+  cors({
+    origin: "http://localhost:3000",
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-};
+  })
+);
 
-// app.use(cors(corsOptions));
-app.use(cors({credentials: true}));
-
-// Json
+// Body parser
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
+
+// Passport init
 app.use(passport.initialize());
 
-//router import
-const authrouter = require("./routes/auth.router");
-
-//API Call 
+// Routes
 app.use("/api/v1/auth", authrouter);
+app.use("/api", chatRoutes);
 
-
-//Just for testing
+// Test route
 app.get("/", (req, res) => {
-    res.send("Server is running...");
+  res.send("Server is running...");
 });
 
-// CATCH-ALL ROUTE (must be last)
+// 404 handler
 app.use((req, res) => {
-    res.status(404).json({ message: "Path does not exist" });
+  res.status(404).json({ message: "Path does not exist" });
 });
 
-//Server listen
+// Start server
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
