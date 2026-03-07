@@ -1,12 +1,17 @@
-const express = require("express");
+import express from "express";
+import passport from "passport";
+
 const router = express.Router();
 
-const userRegistration = require("../Auth/Register");
-const loginUser = require("../Auth/Login");
+// Controllers
+import userRegistration from "../Auth/Register.js";
+import loginUser from "../Auth/Login.js";
+import getUsers from "../controllers/getUsers.js";
 
-const passport = require("passport"); // ✅ FIXED
+// Middleware
+import authentication from "../middlewares/authentication.middleware.js";
 
-// 🔥 DEBUG ROUTE (NO PASSPORT)
+// 🔥 DEBUG ROUTE
 router.get("/google-test", (req, res) => {
   res.send("AUTH ROUTER WORKING");
 });
@@ -27,12 +32,12 @@ router.get(
     failureRedirect: "/",
   }),
   (req, res) => {
-    // req.user is now DB user ✅
     res.redirect("http://localhost:5173/login-success");
   }
 );
 
 router.post("/register", userRegistration);
 router.post("/login", loginUser);
+router.get("/users", authentication, getUsers);
 
-module.exports = router;
+export default router;
