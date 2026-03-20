@@ -1,20 +1,17 @@
+
 import "dotenv/config";
+
 import { GoogleGenAI } from "@google/genai";
+
+import ChatPrompts from "../utils/buildPrompt.js";
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-const askAI = async (message, menuData) => {
+const askAI = async (message,info) => {
 
-    const prompt = `You are a restaurant chatbot.
-    Menu: ${JSON.stringify(menuData)}
-    Customer question: ${message}
-    Tasks:
-    - Recommend dishes,
-    -give data in organize way,
-    Format: name price; and every thing should be separate with semicolon.
-    Answer politely and help the customer choose food.`;
+    const prompt = ChatPrompts(message,info);
 
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
@@ -25,9 +22,6 @@ const askAI = async (message, menuData) => {
 };
 
 export default askAI;
-
-// - Help place orders
-// - Calculate bill if user orders items
 
 
 
