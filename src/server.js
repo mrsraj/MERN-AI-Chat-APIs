@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import AtlasConnect from "./config/atlas_db.js";
+
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -8,9 +10,11 @@ import passport from "passport";
 
 import chatRoutes from "./routes/chat.routes.js";
 import authrouter from "./routes/auth.router.js";
-import connectDB from "./config/db.js";
+import userInfoRouter from "./routes/userInfo.router.js"
+//import connectDB from "./config/db.js";
 
 import "./config/passport.js";
+await AtlasConnect()
 
 const PORT = process.env.PORT;
 
@@ -18,7 +22,7 @@ const PORT = process.env.PORT;
 const app = express();
 
 // Connect DB
-connectDB();
+// connectDB();
 
 // CORS
 app.use(
@@ -39,6 +43,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use("/api/v1/auth", authrouter);
+app.use("/api/v1/", userInfoRouter);
 app.use("/api", chatRoutes);
 
 // Test route
