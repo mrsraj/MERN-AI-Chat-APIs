@@ -20,7 +20,7 @@ const userRegistration = async (req, res) => {
 
         // Create new user
         const user = new User({
-            fullname, // or fullname depending on your schema
+            fullname, 
             email,
             googleId,
             password: hashedPassword
